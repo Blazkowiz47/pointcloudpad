@@ -1,0 +1,13 @@
+*.pyc
+*.npy
+*.zip
+*.gz
+tmp/*
+txtscores/*
+scores/*
+
+.env
+.venv
+env/
+venv/
+ENV/
