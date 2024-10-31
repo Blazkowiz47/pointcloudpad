@@ -4,6 +4,7 @@ from multiprocessing import Pool
 from typing import List
 
 import numpy as np
+from numpy.typing import NDArray
 import pandas as pd
 
 
@@ -19,9 +20,27 @@ hyperparams = [
 num_points = 1024
 
 
-def get_eer(model, heads, iphone, attack, miphone, mattack) -> float:
-    from common_metrics import eer
+def eer(genuine, imposter, bins=10_001) -> float:
+    genuine = np.squeeze(np.array(genuine))
+    imposter = np.squeeze(np.array(imposter))
+    far = np.ones(bins)
+    frr = np.ones(bins)
+    mi = np.min(imposter)
+    mx = np.max(genuine)
+    thresholds = np.linspace(mi, mx, bins)
+    for id, threshold in enumerate(thresholds):
+        fr = np.where(genuine <= threshold)[0].shape[0]
+        fa = np.where(imposter >= threshold)[0].shape[0]
+        frr[id] = fr * 100 / genuine.shape[0]
+        far[id] = fa * 100 / imposter.shape[0]
 
+    di = np.argmin(np.abs(far - frr))
+
+    eer = (far[di] + frr[di]) / 2
+    return eer
+
+
+def get_eer(model, heads, iphone, attack, miphone, mattack) -> float:
     rdir = "/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/"
     genfile = os.path.join(
         rdir,
@@ -35,6 +54,7 @@ def get_eer(model, heads, iphone, attack, miphone, mattack) -> float:
     )
     genscores = np.loadtxt(genfile)
     atkscores = np.loadtxt(atkfile)
+
     try:
         return round(eer(genscores, atkscores), 3)
     except:
@@ -58,13 +78,14 @@ total_layers = [[(3, i) for i in range(1, 8)]]
 total_layers = [[(i, j) for i in range(2, 7) for j in range(1, 8)]]
 total_layers = [[(3, 5)]]
 
-train_till_attack = 2
+attacks = [f"Attack_{i}" for i in range(1, 7)]
+mattacks = ["Display-Attack", "Print-Attack"]
+iphones = ["iPhone11", "iPhone12"]
 
 
 def eval():
-    for iphone in ["iPhone12"]:
-        for i in range(1, train_till_attack):
-            attack = f"Attack_{i}"
+    for iphone in iphones:
+        for attack in attacks:
             print("Trained on:", iphone, attack)
             dfraw = {
                 "model": [],
@@ -74,13 +95,11 @@ def eval():
             }
 
             #             for m in ["DualDGCNN"]:  # ,"DualDGCNN7", "DualDGCNNSA", "DualDGCNNCA"
-            for kernel in [1, 3, 5, 7]:
+            for kernel in [1]:
                 for dmode, layers in zip(dmodes, total_layers):
                     for ll, lr in layers:
                         for miphone in ["iPhone11", "iPhone12"]:
-                            for i in range(1, 7):
-                                mattack = f"Attack_{i}"
-
+                            for mattack in mattacks:
                                 for p in hyperparams:
                                     res = str(
                                         get_eer(
@@ -98,14 +117,15 @@ def eval():
                                     dfraw["eer"].append(res)
                                     dfraw["iphone"].append(miphone)
                                     dfraw["attack"].append(mattack)
+                                    dfraw["tiphone"].append(iphone)
+                                    dfraw["tattack"].append(attack)
 
             models = list(set(dfraw["model"]))
 
             df = pd.DataFrame(dfraw)
             df_raw_reformat = {"iphone": [], "attack": [], **{k: [] for k in models}}
-            for iphone in ["iPhone12"]:
-                for i in range(6, 7):
-                    attack = f"Attack_{i}"
+            for iphone in iphones:
+                for attack in mattacks:
                     temp = df.query(f'iphone=="{iphone}" and attack=="{attack}"')
                     for m in sorted(temp["model"].tolist()):
                         x = temp.query(f'model=="{m}"')
@@ -113,11 +133,11 @@ def eval():
                     df_raw_reformat["iphone"].append(iphone)
                     df_raw_reformat["attack"].append(attack)
             df_reformat = pd.DataFrame(df_raw_reformat)
-            x = df_reformat.query("attack=='Attack_6' and iphone=='iPhone12'")
+            #             x = df_reformat.query("attack=='Attack_6' and iphone=='iPhone12'")
 
             pd.options.display.max_columns = None
             pd.options.display.max_rows = None
-            print(x)
+            print(df_reformat)
 
 
 eval()

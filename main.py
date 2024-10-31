@@ -198,6 +198,7 @@ def test(iphone, attack, params: Params, state_dict=None):
             attack,
             partition="Test",
             num_points=args.num_points,
+            rdir=args.rdir,
         ),
         batch_size=args.test_batch_size,
         drop_last=False,
@@ -240,6 +241,8 @@ def test(iphone, attack, params: Params, state_dict=None):
             data = data.permute(0, 2, 1)
             logits = model(data)
             logits = sfmx(logits)
+            if logits.shape[1] != 2:
+                args.log(logits.shape)
             label = label.detach().cpu().numpy()
             preds = logits.argmax(dim=1)
             logits = logits.detach().cpu().numpy()
@@ -319,6 +322,7 @@ def driver(args: argparse.Namespace) -> None:
         dump_file=args.dump_file,
         dry_run=args.dry_run,
         model_name=f"Ablation_DualDGCNN_DifferentDual_{args.layersleft}_{args.layersright}_{args.dmode}_k{args.kernel}",
+        rdir=args.rdir,
     )
     params.kernel = args.kernel
     params.dmode = args.dmode
@@ -352,6 +356,7 @@ parser.add_argument("--dmode", type=str, default="n")
 parser.add_argument("--kernel", type=int, default=1)
 parser.add_argument("--layersleft", type=int, default=4)
 parser.add_argument("--layersright", type=int, default=4)
+parser.add_argument("--rdir", type=str, default="/home/ubuntu/work/Intra/")
 
 
 def set_seeds(seed: int = 2024):

@@ -7,16 +7,25 @@ from torch.utils.data import Dataset
 
 
 class Custom(Dataset):
-    def __init__(self, iphone, attack, partition="Train", num_points=8192):
-        self.basedir = os.path.join("/home/ubuntu/work/Intra/", iphone, attack)
+    def __init__(
+        self,
+        iphone,
+        attack,
+        partition="Train",
+        rdir="/home/ubuntu/work/Intra/",
+        num_points=8192,
+    ):
+        self.basedir = os.path.join(rdir, iphone, attack)
         self.categories = ["mask", "bona"]
         self.filepaths = []
         self.category_idxs = []
         self.num_points = num_points
 
         for idx, category in enumerate(self.categories):
-            category_path = os.path.join(self.basedir, partition, category, "*.ply")
-            paths = glob.glob(category_path)
+            category_path = os.path.join(
+                self.basedir, partition, category, "**", "*.ply"
+            )
+            paths = glob.glob(category_path, recursive=True)
             self.filepaths += paths
             self.category_idxs += [idx] * len(paths)
         if not len(self.filepaths):

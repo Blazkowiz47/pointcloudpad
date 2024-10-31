@@ -6,12 +6,12 @@ import numpy as np
 
 
 hyperparams = [
-    {"optimizer": "ADAM", "lr": 0.001, "att_heads": 32},
-    {"optimizer": "ADAM", "lr": 0.001, "att_heads": 16},
-    #     {"optimizer": "ADAM", "lr": 0.001, "att_heads": 8},
-    #     {"optimizer": "ADAM", "lr": 0.001, "att_heads": 4},
-    {"optimizer": "ADAM", "lr": 0.001, "att_heads": 2},
-    {"optimizer": "ADAM", "lr": 0.001, "att_heads": 1},
+    #     {"optimizer": "ADAM", "lr": 0.001, "att_heads": 32},
+    #     {"optimizer": "ADAM", "lr": 0.001, "att_heads": 16},
+    {"optimizer": "ADAM", "lr": 0.001, "att_heads": 8},
+    #         {"optimizer": "ADAM", "lr": 0.001, "att_heads": 4},
+    #     {"optimizer": "ADAM", "lr": 0.001, "att_heads": 2},
+    #     {"optimizer": "ADAM", "lr": 0.001, "att_heads": 1},
 ]
 
 
@@ -25,8 +25,8 @@ dmodes = ["c"]
 total_layers = [[(i, j) for i in range(2, 7) for j in range(1, 8)]]
 total_layers = [[(3, 5)]]
 
+train_iphones = ["iPhone11"]
 train_iphones = ["iPhone11", "iPhone12"]
-train_iphones = ["iPhone12"]
 train_till_attack = 2
 kernels = [1]
 
@@ -80,15 +80,19 @@ def train():
         p.map(os.system, args)
 
 
+rdir = "/cluster/nbl-users/Shreyas-Sushrut-Raghu/3D_PAD_Datasets/"
+
+attacks = [f"Attack_{i}" for i in range(1, 7)]
+mattacks = ["Display-Attack", "Print-Attack"]
+
+
 def test():
     args: List[str] = []
     for kernel in kernels:  # [1]:
         for iphone in train_iphones:
-            for i in range(1, train_till_attack):
-                attack = f"Attack_{i}"
+            for attack in attacks:
                 for miphone in ["iPhone11", "iPhone12"]:
-                    for i in range(1, 7):
-                        mattack = f"Attack_{i}"
+                    for mattack in mattacks:
                         #                     for p in hyperparams:
                         #                         args.append(
                         #                             f'python main.py --mode=test --model=DGCNN --miphone={miphone} --mattack={mattack} --iphone={iphone} --attack={attack} --epochs=10 --num_points={num_points} --emb_dims=1024 --k=20 --momentum=0.9 --dropout=0.5 --dump_file=True --dry_run=False --optimizer={p["optimizer"]} --lr={p["lr"]} --att_heads={p["att_heads"]}'  # noqa: E501
@@ -109,7 +113,7 @@ def test():
                             for ll, lr in layers:
                                 for p in hyperparams:
                                     args.append(
-                                        f'python main.py --kernel={kernel} --dmode={dmode} --layersleft={ll} --layersright={lr} --mode=test --model=DualDGCNN --epochs=20 --miphone={miphone} --mattack={mattack} --iphone={iphone} --attack={attack} --num_points={num_points} --emb_dims=1024 --k=20 --optimizer={p["optimizer"]} --lr={p["lr"]} --att_heads={p["att_heads"]} --momentum=0.9 --dropout=0.5 --dump_file=True --dry_run=False'  # noqa: E501
+                                        f'python main.py --rdir="{rdir}" --kernel={kernel} --dmode={dmode} --layersleft={ll} --layersright={lr} --mode=test --model=DualDGCNN --epochs=20 --miphone={miphone} --mattack={mattack} --iphone={iphone} --attack={attack} --num_points={num_points} --emb_dims=1024 --k=20 --optimizer={p["optimizer"]} --lr={p["lr"]} --att_heads={p["att_heads"]} --momentum=0.9 --dropout=0.5 --dump_file=True --dry_run=False'  # noqa: E501
                                     )
                         #                     for p in hyperparams:
                         #                         args.append(
@@ -128,7 +132,7 @@ def test():
         #                             f'python main.py --mode=test --model=DualDGCNNCA --epochs=20 --miphone={miphone} --mattack={mattack} --iphone={iphone} --attack={attack} --num_points={num_points} --emb_dims=1024 --k=20 --optimizer={p["optimizer"]} --lr={p["lr"]} --att_heads={p["att_heads"]} --momentum=0.9 --dropout=0.5 --dump_file=True --dry_run=False'  # noqa: E501
         #                         )
 
-    with Pool(10) as p:
+    with Pool(8) as p:
         p.map(os.system, args)
 
 

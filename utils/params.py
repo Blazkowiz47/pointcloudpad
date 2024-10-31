@@ -45,6 +45,7 @@ class Params:
         self.random_state = 42
         self.model_name = kwargs.get("model_name", None)
         self.kernel = 1
+        self.rdir = ""
 
         for attr_name in kwargs.keys():
             setattr(self, attr_name, kwargs[attr_name])
