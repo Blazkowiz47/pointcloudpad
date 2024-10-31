@@ -2,6 +2,8 @@
 *.npy
 *.zip
 *.gz
+*.csv
+*.png
 tmp/*
 txtscores/*
 scores/*

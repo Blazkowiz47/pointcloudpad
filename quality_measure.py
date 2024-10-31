@@ -74,7 +74,7 @@ def driver() -> None:
             for k, v in result.items():
                 if k not in total_means:
                     total_means[k] = []
-                np.save(f"quality_results/{cid}_{iphone}_{attack}.npy", np.array(v))
+                np.save(f"quality_results/{cid}_{iphone}_{attack}_{k}.npy", np.array(v))
 
                 total_means[k].append((
                     round(np.mean(v).tolist(), 2),
