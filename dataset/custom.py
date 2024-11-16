@@ -12,7 +12,7 @@ class Custom(Dataset):
         iphone,
         attack,
         partition="Train",
-        rdir="/home/ubuntu/work/Intra/",
+        rdir="/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra/",
         num_points=8192,
     ):
         self.basedir = os.path.join(rdir, iphone, attack)
@@ -25,9 +25,12 @@ class Custom(Dataset):
             category_path = os.path.join(
                 self.basedir, partition, category, "**", "*.ply"
             )
+            print("Fetching:", category_path)
             paths = glob.glob(category_path, recursive=True)
+            print("Fetched:", len(paths))
             self.filepaths += paths
             self.category_idxs += [idx] * len(paths)
+
         if not len(self.filepaths):
             print("Loading data for:", partition, len(self.filepaths), iphone, attack)
             exit()

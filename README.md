@@ -5,3 +5,12 @@ Point cloud is an important geometric representation that can be used to represe
 
 The Implementation of DGCNN and PointNet are based on https://github.com/WangYueFt/dgcnn/tree/master/pytorch
 and re-implementation from: https://github.com/andersonnascimento/PointCloudAttentionNet
+
+### Setup environment
+```
+conda create -n point python==3.8.10 -y 
+conda install pytorch==2.1.1 torchvision==0.16.1 torchaudio==2.1.1 pytorch-cuda=12.1 -c pytorch -c nvidia -y
+pip install -r requirements.txt
+conda install scikit-image -y
+
+```

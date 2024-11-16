@@ -205,7 +205,7 @@ def test(iphone, attack, params: Params, state_dict=None):
         num_workers=4,
         shuffle=True,
     )
-    rdir = "/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/"
+    rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/"
     #     if os.path.isfile(
     #         f"{rdir}/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/atk_{iphone}_{attack}.txt"
     #     ) and os.path.isfile(
@@ -219,7 +219,9 @@ def test(iphone, attack, params: Params, state_dict=None):
     if state_dict != None:
         model.load_state_dict(torch.load(state_dict))
     else:
-        model.load_state_dict(torch.load(params.best_checkpoint()))
+        checkpoint = params.best_checkpoint()
+        print(checkpoint)
+        model.load_state_dict(torch.load(checkpoint))
 
     genuine_scores = []
     morph_scores = []

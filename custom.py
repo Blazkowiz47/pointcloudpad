@@ -37,6 +37,7 @@ def train():
         for iphone in train_iphones:
             for i in range(1, train_till_attack):
                 attack = f"Attack_{i}"
+                attack = "*"
                 #             for p in hyperparams:
                 #                 args.append(
                 #                     f'python main.py  --model=DGCNN --iphone={iphone} --attack={attack} --epochs=10 --num_points={num_points} --emb_dims=1024 --k=20 --momentum=0.9 --dropout=0.5 --dump_file=True --dry_run=False --optimizer={p["optimizer"]} --lr={p["lr"]} --att_heads={p["att_heads"]}'  # noqa: E501
@@ -76,14 +77,15 @@ def train():
         #                     f'python main.py  --model=DualDGCNNCA --epochs=100 --iphone={iphone} --attack={attack} --num_points={num_points} --emb_dims=1024 --k=20 --optimizer={p["optimizer"]} --lr={p["lr"]} --att_heads={p["att_heads"]} --momentum=0.9 --dropout=0.5 --dump_file=True --dry_run=False'  # noqa: E501
         #                 )
 
-    with Pool(2) as p:
+    with Pool(1) as p:
         p.map(os.system, args)
 
 
-rdir = "/cluster/nbl-users/Shreyas-Sushrut-Raghu/3D_PAD_Datasets/"
+rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra"
 
-attacks = [f"Attack_{i}" for i in range(1, 7)]
-mattacks = ["Display-Attack", "Print-Attack"]
+attacks = [f"Attack_{i}" for i in range(1, 2)]
+mattacks = [f"Attack_{i}" for i in range(9, 10)]
+# ["Display-Attack", "Print-Attack"]
 
 
 def test():
@@ -91,6 +93,7 @@ def test():
     for kernel in kernels:  # [1]:
         for iphone in train_iphones:
             for attack in attacks:
+                attack = "*"
                 for miphone in ["iPhone11", "iPhone12"]:
                     for mattack in mattacks:
                         #                     for p in hyperparams:
