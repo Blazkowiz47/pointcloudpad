@@ -234,6 +234,17 @@ def test(iphone, attack, params: Params, state_dict=None):
         test_true = []
         test_pred = []
         for data, label in test_loader:
+            from fvcore.nn import FlopCountAnalysis
+
+            b, t, e = data.shape
+            data = data[0, :, :].reshape((1, t, e))
+            data = data.permute(0, 2, 1).cuda()
+            flops = FlopCountAnalysis(model, data)
+            total_flops = flops.total()
+            args.log(f"Total flops (G): {total_flops / 1_000_000_000}")
+            total_params = sum(p.numel() for p in model.parameters())
+            args.log(f"Total params (1e6): {total_params / 1_000_000}")
+            exit()
             batch_size = data.size()[0]
             if batch_size == 1:
                 data = torch.concat([data, data], axis=0)

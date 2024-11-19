@@ -84,7 +84,7 @@ def train():
 rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra"
 
 attacks = [f"Attack_{i}" for i in range(1, 2)]
-mattacks = [f"Attack_{i}" for i in range(9, 10)]
+mattacks = [f"Attack_{i}" for i in range(8, 9)]
 # ["Display-Attack", "Print-Attack"]
 
 
@@ -136,7 +136,7 @@ def test():
         #                         )
 
     with Pool(8) as p:
-        p.map(os.system, args)
+        p.map(os.system, [args[0]])
 
 
 # train()

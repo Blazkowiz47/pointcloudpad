@@ -45,21 +45,28 @@ total_means = {
 def driver() -> None:
     args = []
 
-    ROOT_DIR = "/cluster/nbl-users/Shreyas-Sushrut-Raghu/3D_PAD_Datasets/"
-    attacks = ["Display-Attack", "Print-Attack"]
+    #     ROOT_DIR = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Ragh/"
+    #     attacks = ["Display-Attack", "Print-Attack"]
+    #     for iphone in iphones:
+    #         for attack in attacks:
+    #             for cid in ["mask", "bona"]:
+    #                 rdir = os.path.join(ROOT_DIR, iphone, attack, "test", cid)
+    #                 args.append((rdir, iphone, attack, cid))
+    #
+    ROOT_DIR = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra/"
+    attacks = [f"Attack_{i}" for i in [8]]
     for iphone in iphones:
         for attack in attacks:
-            for cid in ["mask", "bona"]:
+            for cid in ["bona"]:
                 rdir = os.path.join(ROOT_DIR, iphone, attack, "test", cid)
                 args.append((rdir, iphone, attack, cid))
 
-    ROOT_DIR = "/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra/"
-    attacks = [f"Attack_{i}" for i in range(1, 7)]
-    for iphone in iphones:
-        for attack in attacks:
-            for cid in ["mask"]:
-                rdir = os.path.join(ROOT_DIR, iphone, attack, "test", cid)
-                args.append((rdir, iphone, attack, cid))
+    #     attacks = [f"Attack_{i}" for i in range(1, 9)]
+    #     for iphone in iphones:
+    #         for attack in attacks:
+    #             for cid in ["mask"]:
+    #                 rdir = os.path.join(ROOT_DIR, iphone, attack, "test", cid)
+    #                 args.append((rdir, iphone, attack, cid))
 
     with Pool(20) as p:
         os.makedirs("quality_results", exist_ok=True)
@@ -76,10 +83,12 @@ def driver() -> None:
                     total_means[k] = []
                 np.save(f"quality_results/{cid}_{iphone}_{attack}_{k}.npy", np.array(v))
 
-                total_means[k].append((
-                    round(np.mean(v).tolist(), 2),
-                    round(np.std(v).tolist(), 2),
-                ))
+                total_means[k].append(
+                    (
+                        round(np.mean(v).tolist(), 2),
+                        round(np.std(v).tolist(), 2),
+                    )
+                )
 
 
 if __name__ == "__main__":
