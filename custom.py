@@ -25,8 +25,8 @@ dmodes = ["c"]
 total_layers = [[(i, j) for i in range(2, 7) for j in range(1, 8)]]
 total_layers = [[(3, 5)]]
 
-train_iphones = ["iPhone11"]
 train_iphones = ["iPhone11", "iPhone12"]
+train_iphones = ["iPhone12"]
 train_till_attack = 2
 kernels = [1]
 
@@ -81,10 +81,11 @@ def train():
         p.map(os.system, args)
 
 
-rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra"
+rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra/"
+ckpt_rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/"
 
-attacks = [f"Attack_{i}" for i in range(1, 2)]
-mattacks = [f"Attack_{i}" for i in range(8, 9)]
+train_attacks = [f"Attack_{i}" for i in range(4, 5)]
+mattacks = [f"Attack_{i}" for i in range(1, 9)]
 # ["Display-Attack", "Print-Attack"]
 
 
@@ -92,9 +93,8 @@ def test():
     args: List[str] = []
     for kernel in kernels:  # [1]:
         for iphone in train_iphones:
-            for attack in attacks:
-                attack = "*"
-                for miphone in ["iPhone11", "iPhone12"]:
+            for attack in train_attacks:
+                for miphone in ["iPhone12", "iPhone11"]:
                     for mattack in mattacks:
                         #                     for p in hyperparams:
                         #                         args.append(
@@ -136,7 +136,7 @@ def test():
         #                         )
 
     with Pool(8) as p:
-        p.map(os.system, [args[0]])
+        p.map(os.system, args)
 
 
 # train()

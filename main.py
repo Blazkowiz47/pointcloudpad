@@ -1,34 +1,30 @@
 #!/usr/bin/env python
 import argparse
-from typing import Any, List, Tuple
-import random
-from dataset.custom import Custom
-from utils.params import Params
-
-import time
-import numpy as np
-import torch
-import torch.nn as nn
-from utils.utility import calculate_loss
-
-from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import CosineAnnealingLR
-from multiprocessing import Pool
 import os
+import random
+import time
+
+import numpy as np
+import sklearn.metrics as metrics
+import torch
+from fvcore.nn import FlopCountAnalysis
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+
 
 # import model
 from model.attention_dgcnn import AttentionDGCNN
 from model.dgcnn import DGCNN
-from model.point_attention_net import PointAttentionNet
-from model.point_net import PointNet
-from model.modified_dgcnn import ModDGCNN
 from model.dual_dgcnn import DualDGCNN
 from model.dual_dgcnn_7 import DualDGCNN7
-from model.dual_dgcnn_sattn import DualDGCNNSA
 from model.dual_dgcnn_cattn import DualDGCNNCA
-
-
-import sklearn.metrics as metrics
+from model.dual_dgcnn_sattn import DualDGCNNSA
+from model.modified_dgcnn import ModDGCNN
+from model.point_attention_net import PointAttentionNet
+from model.point_net import PointNet
+from utils.params import Params
+from utils.utility import calculate_loss
 
 
 def train(args: Params):
@@ -205,7 +201,7 @@ def test(iphone, attack, params: Params, state_dict=None):
         num_workers=4,
         shuffle=True,
     )
-    rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/"
+    rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual"
     #     if os.path.isfile(
     #         f"{rdir}/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/atk_{iphone}_{attack}.txt"
     #     ) and os.path.isfile(
@@ -225,6 +221,7 @@ def test(iphone, attack, params: Params, state_dict=None):
 
     genuine_scores = []
     morph_scores = []
+    x1s, x2s, labels = None, None, None
 
     with torch.no_grad():
         sfmx = torch.nn.Softmax(dim=1).cuda()
@@ -233,29 +230,45 @@ def test(iphone, attack, params: Params, state_dict=None):
         count = 0.0
         test_true = []
         test_pred = []
-        for data, label in test_loader:
-            from fvcore.nn import FlopCountAnalysis
-
+        for data, label in tqdm(test_loader):
             b, t, e = data.shape
-            data = data[0, :, :].reshape((1, t, e))
-            data = data.permute(0, 2, 1).cuda()
-            flops = FlopCountAnalysis(model, data)
-            total_flops = flops.total()
-            args.log(f"Total flops (G): {total_flops / 1_000_000_000}")
-            total_params = sum(p.numel() for p in model.parameters())
-            args.log(f"Total params (1e6): {total_params / 1_000_000}")
-            exit()
+            #             data = data[0, :, :].reshape((1, t, e))
+            #             data = data.permute(0, 2, 1).cuda()
+            #             flops = FlopCountAnalysis(model, data)
+            #             total_flops = flops.total()
+            #             args.log(f"Total flops (G): {total_flops / 1_000_000_000}")
+            #             total_params = sum(p.numel() for p in model.parameters())
+            #             args.log(f"Total params (1e6): {total_params / 1_000_000}")
+
             batch_size = data.size()[0]
             if batch_size == 1:
                 data = torch.concat([data, data], axis=0)
                 label = torch.concat([label, label], axis=0)
+
             batch_size = data.size()[0]
             data, label = data.to(device), label.to(device).squeeze()
             data = data.permute(0, 2, 1)
-            logits = model(data)
+            logits, x1, x2 = model(data)
+            if x1s is None:
+                x1s = x1.detach().cpu().numpy()
+            else:
+                x1s = np.concatenate((x1s, x1.detach().cpu().numpy()), axis=0)
+
+            if x2s is None:
+                x2s = x2.detach().cpu().numpy()
+            else:
+                x2s = np.concatenate((x2s, x2.detach().cpu().numpy()), axis=0)
+
+            if labels is None:
+                labels = label.detach().cpu().numpy()
+            else:
+                labels = np.concatenate((labels, label.detach().cpu().numpy()), axis=0)
+
             logits = sfmx(logits)
+
             if logits.shape[1] != 2:
                 args.log(logits.shape)
+
             label = label.detach().cpu().numpy()
             preds = logits.argmax(dim=1)
             logits = logits.detach().cpu().numpy()
@@ -267,6 +280,7 @@ def test(iphone, attack, params: Params, state_dict=None):
 
             test_true.append(label)
             test_pred.append(preds.detach().cpu().numpy())
+
         test_true = np.concatenate(test_true)
         test_pred = np.concatenate(test_pred)
         test_acc = metrics.accuracy_score(test_true, test_pred)
@@ -293,6 +307,32 @@ def test(iphone, attack, params: Params, state_dict=None):
     np.savetxt(
         f"{rdir}/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/atk_{iphone}_{attack}.txt",
         np.array(morph_scores),
+    )
+
+    os.makedirs(
+        f"{rdir}/labels/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/",
+        exist_ok=True,
+    )
+    os.makedirs(
+        f"{rdir}/feature1/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/",
+        exist_ok=True,
+    )
+    os.makedirs(
+        f"{rdir}/feature2/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/",
+        exist_ok=True,
+    )
+
+    np.save(
+        f"{rdir}/feature1/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/atk_{iphone}_{attack}.npy",
+        np.array(x1s),
+    )
+    np.save(
+        f"{rdir}/feature2/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/atk_{iphone}_{attack}.npy",
+        np.array(x2s),
+    )
+    np.save(
+        f"{rdir}/labels/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/atk_{iphone}_{attack}.npy",
+        np.array(labels),
     )
 
 

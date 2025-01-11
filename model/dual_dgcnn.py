@@ -217,10 +217,12 @@ class DualDGCNN(nn.Module):
 
         x = F.leaky_relu(self.bn6(self.linear1(x)), negative_slope=0.2)
         x = self.dp1(x)
+        x2 = x
         x = F.leaky_relu(self.bn7(self.linear2(x)), negative_slope=0.2)
         x = self.dp2(x)
+        x1 = x
         x = self.linear3(x)
-        return x
+        return x, x1, x2
 
 
 class EBlock(nn.Module):

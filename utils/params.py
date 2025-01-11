@@ -51,6 +51,7 @@ class Params:
             setattr(self, attr_name, kwargs[attr_name])
 
         self.output_dir = f"./tmp/{self.model_name or self.model.__name__}_{self.att_heads}_{self.kernel}/{self.iphone}/{self.attack}"
+        self.output_dir = f"/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/pad3d/PointCloudAttentionNet/tmp/{self.model_name or self.model.__name__}_{self.att_heads}_{self.kernel}/{self.iphone}/{self.attack}"
         self.execution_id = self.generate_execution_id(
             self.output_dir, self.dataset_loader.__name__
         )
