@@ -6,7 +6,7 @@ import matplotlib.cm as cm
 from sklearn.metrics import DetCurveDisplay
 
 
-ROOT = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/Ablation_DualDGCNN_DifferentDual_3_5_c_k1_8"
+ROOT = "<Root-Directory>"
 train_iphone = ["iPhone11"]
 train_attack = [f"Attack_{i}" for i in range(1, 7)]
 test_iphone = ["iPhone12"]
@@ -89,7 +89,7 @@ def plot_custom(train_iphone, train_attack):
     plt.tight_layout()
     plt.savefig(
         os.path.join(
-            "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/3D_PAD_Datasets/plots",
+            "<Root-Directory>",
             f"DET_{train_iphone}_{train_attack}.png",
         ),
     )
@@ -137,7 +137,7 @@ def plot(tiphone, tattack):
     plt.tight_layout()
     plt.savefig(
         os.path.join(
-            "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/3D_PAD_Datasets/plots",
+            "<Root-Directory>",
             f"DET_{tiphone}_{tattack}.png",
         ),
     )

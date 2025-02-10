@@ -41,7 +41,7 @@ def eer(genuine, imposter, bins=10_001) -> float:
 
 
 def get_eer(model, heads, iphone, attack, miphone, mattack) -> float:
-    rdir = "/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/"
+    rdir = "<Root-Directory>"
     genfile = os.path.join(
         rdir,
         model + "_" + str(heads),

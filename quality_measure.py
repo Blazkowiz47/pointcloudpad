@@ -45,7 +45,7 @@ total_means = {
 def driver() -> None:
     args = []
 
-    #     ROOT_DIR = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Ragh/"
+    #     ROOT_DIR = "ROOT_DIR"
     #     attacks = ["Display-Attack", "Print-Attack"]
     #     for iphone in iphones:
     #         for attack in attacks:
@@ -53,7 +53,7 @@ def driver() -> None:
     #                 rdir = os.path.join(ROOT_DIR, iphone, attack, "test", cid)
     #                 args.append((rdir, iphone, attack, cid))
     #
-    ROOT_DIR = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra/"
+    ROOT_DIR = "ROOT_DIR"
     attacks = [f"Attack_{i}" for i in [8]]
     for iphone in iphones:
         for attack in attacks:

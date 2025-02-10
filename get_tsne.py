@@ -12,9 +12,9 @@ import matplotlib.cm as cm
 iphones = ["iPhone11", "iPhone12"]
 attacks = [f"Attack_{i}" for i in range(1, 9)]
 
-FT1_ROOT = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/feature1/Ablation_DualDGCNN_DifferentDual_3_5_c_k1_8/trained_on_iPhone12_Attack_4/"
-FT2_ROOT = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/feature2/Ablation_DualDGCNN_DifferentDual_3_5_c_k1_8/trained_on_iPhone12_Attack_4/"
-LBL_ROOT = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/labels/Ablation_DualDGCNN_DifferentDual_3_5_c_k1_8/trained_on_iPhone12_Attack_4/"
+FT1_ROOT = "<Root-Directory>"
+FT2_ROOT = "<Root-Directory>"
+LBL_ROOT = "<Root-Directory>"
 
 
 def get_files(iphone, attack) -> Tuple[str, str, str]:
@@ -124,12 +124,12 @@ def plot_features(
     plt.legend(handles=total_patches)
     plt.tight_layout()
     os.makedirs(
-        "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/3D_PAD_Datasets/plots/",
+        "<Root-Directory>",
         exist_ok=True,
     )
     plt.savefig(
         os.path.join(
-            "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/3D_PAD_Datasets/plots/",
+            "<Root-Directory>",
             "pca_" + tiphone + "_" + fname + ".png",
         )
     )

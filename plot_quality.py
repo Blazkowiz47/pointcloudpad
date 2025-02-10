@@ -64,7 +64,7 @@ for iphone in tqdm(iphones):
     plt.xlim(-0.2, 0.3)
     plt.tight_layout()
     plt.savefig(
-        f"/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/3D_PAD_Datasets/pca_{iphone}.png",
+        f"ROOT_DIR",
         bbox_inches="tight",
     )
     # plt.savefig(f'plot_test_tsne_{iphone}.png')

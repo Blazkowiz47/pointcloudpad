@@ -81,8 +81,8 @@ def train():
         p.map(os.system, args)
 
 
-rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra/"
-ckpt_rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual/"
+rdir = "<Root-Directory>"
+ckpt_rdir = "<Root-Directory>"
 
 train_attacks = [f"Attack_{i}" for i in range(4, 5)]
 mattacks = [f"Attack_{i}" for i in range(1, 9)]

@@ -12,7 +12,7 @@ class Custom(Dataset):
         iphone,
         attack,
         partition="Train",
-        rdir="/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/Intra/",
+        rdir="ROOT_DIR",
         num_points=8192,
     ):
         self.basedir = os.path.join(rdir, iphone, attack)

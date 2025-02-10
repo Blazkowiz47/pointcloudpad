@@ -201,7 +201,7 @@ def test(iphone, attack, params: Params, state_dict=None):
         num_workers=4,
         shuffle=True,
     )
-    rdir = "/mnt/cluster/nbl-users/Shreyas-Sushrut-Raghu/PAD-Features/DifferentDual"
+    rdir = "<Root-Directory>"
     #     if os.path.isfile(
     #         f"{rdir}/{params.model_name or params.model.__name__}_{params.att_heads}/trained_on_{args.iphone}_{args.attack}/atk_{iphone}_{attack}.txt"
     #     ) and os.path.isfile(
